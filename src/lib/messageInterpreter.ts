@@ -54,22 +54,27 @@ export async function interpretMessage(message: string): Promise<MessageInterpre
 
 export async function interpretMessageDetailed(message: string): Promise<DetailedInterpretation> {
   const fallback = interpretWithRules(message);
+  const apiKey = process.env.OPENROUTER_API_KEY ?? process.env.OPENAI_API_KEY;
 
-  if (process.env.AI_ENABLED !== "true" || !process.env.OPENAI_API_KEY) {
+  if (process.env.AI_ENABLED !== "true" || !apiKey) {
     return { interpretation: fallback, method: "RULES" };
   }
 
   try {
+    const baseUrl = process.env.OPENROUTER_BASE_URL ?? process.env.OPENAI_BASE_URL ?? "https://openrouter.ai/api/v1";
+    const model = process.env.OPENROUTER_MODEL ?? process.env.OPENAI_MODEL ?? "openrouter/free";
     const response = await fetch(
-      `${(process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "")}/chat/completions`,
+      `${baseUrl.replace(/\/$/, "")}/chat/completions`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          ...(process.env.OPENROUTER_SITE_URL ? { "HTTP-Referer": process.env.OPENROUTER_SITE_URL } : {}),
+          ...(process.env.OPENROUTER_APP_NAME ? { "X-OpenRouter-Title": process.env.OPENROUTER_APP_NAME } : {}),
         },
         body: JSON.stringify({
-          model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+          model,
           temperature: 0,
           max_tokens: 120,
           response_format: { type: "json_schema", json_schema: { name: "message_interpretation", strict: true, schema: RESPONSE_SCHEMA } },

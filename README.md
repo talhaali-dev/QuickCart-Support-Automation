@@ -59,13 +59,18 @@ npm run build
 | `USE_MOCK_ORDER_API` | `true` | Uses the self-contained mock order adapter. Set exactly to `false` to enable HTTP mode. |
 | `ORDER_API_URL` | unset | Base URL for the real order service. Required only when mock mode is disabled. |
 | `AI_ENABLED` | `false` | Enables the optional message interpretation layer only when set to `true`. |
-| `OPENAI_API_KEY` | unset | API key for an OpenAI-compatible chat completion endpoint. Not required in demo mode. |
-| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Optional OpenAI-compatible API base URL. |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Small, low-cost interpretation model override. |
+| `OPENROUTER_API_KEY` | unset | OpenRouter API key. Use this with the free router when enabling AI. |
+| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | OpenRouter’s OpenAI-compatible API base URL. |
+| `OPENROUTER_MODEL` | `openrouter/free` | Free-model router; it selects an available free model for each request. |
+| `OPENROUTER_SITE_URL` | unset | Optional site URL attribution header for OpenRouter. |
+| `OPENROUTER_APP_NAME` | `QuickCart Support Automation` | Optional app-name attribution header for OpenRouter. |
+| `OPENAI_API_KEY` | unset | Generic OpenAI-compatible fallback key if OpenRouter variables are absent. |
+| `OPENAI_BASE_URL` | unset | Generic OpenAI-compatible fallback base URL. |
+| `OPENAI_MODEL` | unset | Generic OpenAI-compatible fallback model. |
 
 If `USE_MOCK_ORDER_API=false` but `ORDER_API_URL` is absent, the application safely falls back to the mock adapter. No private-network access is required for local or Vercel deployment.
 
-When `AI_ENABLED=false` or no API key is present, the deterministic interpreter is used. If the optional model times out or returns invalid JSON, the same rules path is used automatically. The model can classify language and extract an order ID, but the `OrderService` remains the only source of order status and no model output can execute returns, refunds, or other transactions.
+When `AI_ENABLED=false` or no API key is present, the deterministic interpreter is used. To try OpenRouter’s free route locally, set `AI_ENABLED=true` and `OPENROUTER_API_KEY` (the default model is `openrouter/free`). If the optional model times out or returns invalid JSON, the same rules path is used automatically. The model can classify language and extract an order ID, but the `OrderService` remains the only source of order status and no model output can execute returns, refunds, or other transactions.
 
 ## Deploy to Vercel
 
