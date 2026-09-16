@@ -51,8 +51,9 @@ export function SupportDemo() {
       const fallback: SupportResponse = {
         reply: "The support workflow is unavailable. Please try again or contact a support agent.",
         trace: [
-          { label: "Outcome", value: "WORKFLOW_FAILURE", tone: "warning" },
-          { label: "Decision", value: "HUMAN_HANDOFF", tone: "warning" },
+          { title: "Understanding", items: [{ label: "Method", value: "RULES" }] },
+          { title: "Execution", items: [{ label: "Tool", value: "Support workflow" }, { label: "Result", value: "WORKFLOW_FAILURE", tone: "warning" }] },
+          { title: "Decision", items: [{ label: "Reply", value: "Support unavailable" }, { label: "Human handoff", value: "YES", tone: "warning" }, { label: "Reason", value: "WORKFLOW_FAILURE" }] },
         ],
       };
       setTrace(fallback);
@@ -127,8 +128,8 @@ export function SupportDemo() {
               <div className="trace-empty"><span><Icon name="route" /></span><h3>No message processed yet</h3><p>Choose a quick scenario or send a message to inspect the routing decision.</p></div>
             ) : (
               <>
-                <div className="trace-list">
-                  {trace.trace.map((entry, index) => <div className="trace-row" key={`${entry.label}-${index}`}><span>{entry.label}</span><strong className={entry.tone ? `tone-${entry.tone}` : ""}>{entry.value}</strong></div>)}
+                <div className="trace-sections">
+                  {trace.trace.map((section) => <div className="trace-section" key={section.title}><div className="trace-section-title"><span className="trace-section-number">{section.title === "Understanding" ? "01" : section.title === "Execution" ? "02" : "03"}</span><strong>{section.title}</strong></div><div className="trace-list">{section.items.map((entry, index) => <div className="trace-row" key={`${entry.label}-${index}`}><span>{entry.label}</span><strong className={entry.tone ? `tone-${entry.tone}` : ""}>{entry.value}</strong></div>)}</div></div>)}
                 </div>
                 {trace.handoff && (
                   <div className="handoff-card">

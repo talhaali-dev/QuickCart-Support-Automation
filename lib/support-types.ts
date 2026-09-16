@@ -11,6 +11,11 @@ export type TraceItem = {
   tone?: "default" | "success" | "warning";
 };
 
+export type TraceSection = {
+  title: "Understanding" | "Execution" | "Decision";
+  items: TraceItem[];
+};
+
 export type Handoff = {
   customer: string;
   intent: Intent;
@@ -21,7 +26,7 @@ export type Handoff = {
 
 export type SupportResponse = {
   reply: string;
-  trace: TraceItem[];
+  trace: TraceSection[];
   handoff?: Handoff;
 };
 

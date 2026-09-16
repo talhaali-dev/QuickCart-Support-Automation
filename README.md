@@ -20,6 +20,7 @@ Every result includes a Decision Trace. Escalated results also include a structu
 ## What the prototype demonstrates
 
 - Deterministic routing with no external LLM
+- Optional low-cost LLM interpretation for intent, language, and entity extraction (rules remain the default and fallback)
 - Trusted order lookup by ID or phone
 - Safe failure, not-found, ambiguous, and timeout behavior
 - Clearly labeled illustrative FAQ content
@@ -57,8 +58,14 @@ npm run build
 | --- | --- | --- |
 | `USE_MOCK_ORDER_API` | `true` | Uses the self-contained mock order adapter. Set exactly to `false` to enable HTTP mode. |
 | `ORDER_API_URL` | unset | Base URL for the real order service. Required only when mock mode is disabled. |
+| `AI_ENABLED` | `false` | Enables the optional message interpretation layer only when set to `true`. |
+| `OPENAI_API_KEY` | unset | API key for an OpenAI-compatible chat completion endpoint. Not required in demo mode. |
+| `OPENAI_BASE_URL` | `https://api.openai.com/v1` | Optional OpenAI-compatible API base URL. |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Small, low-cost interpretation model override. |
 
 If `USE_MOCK_ORDER_API=false` but `ORDER_API_URL` is absent, the application safely falls back to the mock adapter. No private-network access is required for local or Vercel deployment.
+
+When `AI_ENABLED=false` or no API key is present, the deterministic interpreter is used. If the optional model times out or returns invalid JSON, the same rules path is used automatically. The model can classify language and extract an order ID, but the `OrderService` remains the only source of order status and no model output can execute returns, refunds, or other transactions.
 
 ## Deploy to Vercel
 
