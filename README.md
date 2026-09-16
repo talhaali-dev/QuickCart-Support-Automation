@@ -64,6 +64,7 @@ npm run build
 | `OPENROUTER_MODEL` | `openrouter/free` | Free-model router; it selects an available free model for each request. |
 | `OPENROUTER_SITE_URL` | unset | Optional site URL attribution header for OpenRouter. |
 | `OPENROUTER_APP_NAME` | `QuickCart Support Automation` | Optional app-name attribution header for OpenRouter. |
+| `AI_TIMEOUT_MS` | `45000` | Optional interpreter timeout; free routed models can be slow while selecting a provider. |
 | `OPENAI_API_KEY` | unset | Generic OpenAI-compatible fallback key if OpenRouter variables are absent. |
 | `OPENAI_BASE_URL` | unset | Generic OpenAI-compatible fallback base URL. |
 | `OPENAI_MODEL` | unset | Generic OpenAI-compatible fallback model. |

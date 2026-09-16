@@ -83,20 +83,37 @@ export async function interpretMessageDetailed(message: string): Promise<Detaile
             { role: "user", content: message },
           ],
         }),
-        signal: AbortSignal.timeout(3_000),
+        // Free-tier routed models can take longer while selecting a provider or reasoning.
+        signal: AbortSignal.timeout(Number(process.env.AI_TIMEOUT_MS ?? 45_000)),
         cache: "no-store",
       },
     );
 
     if (!response.ok) throw new Error(`Interpreter returned ${response.status}`);
-    const body = (await response.json()) as { choices?: Array<{ message?: { content?: unknown } }> };
-    const content = body.choices?.[0]?.message?.content;
+    const body = (await response.json()) as {
+      choices?: Array<{
+        message?: {
+          content?: unknown;
+          reasoning?: unknown;
+          reasoning_details?: Array<{ text?: unknown }>;
+        };
+      }>;
+    };
+    const messageResult = body.choices?.[0]?.message;
+    // Some OpenRouter free reasoning models return structured JSON in `reasoning`
+    // while leaving `content` null. It is still constrained by the schema/prompt.
+    const content = typeof messageResult?.content === "string"
+      ? messageResult.content
+      : typeof messageResult?.reasoning === "string"
+        ? messageResult.reasoning
+        : messageResult?.reasoning_details?.find((detail) => typeof detail.text === "string")?.text;
     if (typeof content !== "string") throw new Error("Interpreter returned no content");
 
     const parsed = JSON.parse(stripCodeFence(content)) as unknown;
     const interpretation = validateInterpretation(parsed, message);
     return { interpretation, method: "AI" };
-  } catch {
+  } catch (error) {
+    console.error("Message interpreter fallback to rules", error instanceof Error ? error.message : error);
     return { interpretation: fallback, method: "RULES" };
   }
 }
