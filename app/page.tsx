@@ -35,24 +35,47 @@ export default function Home() {
         <SupportDemo />
 
         <section className="architecture-section" aria-labelledby="architecture-title">
-          <div className="section-heading">
-            <p className="eyebrow">System design</p>
-            <h2 id="architecture-title">Architecture</h2>
-            <p>Language is interpreted at the edge. Business facts stay behind typed, replaceable services.</p>
+          <div className="section-heading architecture-heading">
+            <div><p className="eyebrow">System design</p><h2 id="architecture-title">Architecture</h2></div>
+            <p>Every message follows the same observable path: understand the request, consult only an approved system, then answer or escalate safely.</p>
           </div>
-          <div className="flow" aria-label="Support routing flow">
-            <FlowCard step="01" title="Incoming message" detail="Simulated WhatsApp" />
-            <FlowArrow />
-            <FlowCard step="02" title="Normalize" detail="Clean & extract entities" />
-            <FlowArrow />
-            <FlowCard step="03" title="Intent router" detail="Deterministic rules" accent />
-            <FlowArrow />
-            <div className="branch-grid">
-              <FlowCard step="A" title="Order status" detail="OrderService → answer / human" />
-              <FlowCard step="B" title="FAQ" detail="Approved knowledge → answer / human" />
-              <FlowCard step="C" title="Return" detail="Human → future Returns API" />
-              <FlowCard step="D" title="Human / unknown" detail="Human support" />
+          <div className="architecture-diagram" aria-label="QuickCart support automation architecture diagram">
+            <div className="diagram-ingress">
+              <DiagramNode index="01" title="Incoming message" detail="Simulated WhatsApp" icon="◎" />
+              <span className="diagram-line vertical" aria-hidden="true" />
+              <DiagramNode index="02" title="Normalize" detail="Clean text · extract order ID / phone" icon="⌁" />
             </div>
+            <span className="diagram-line horizontal" aria-hidden="true" />
+            <div className="diagram-router">
+              <span className="diagram-index">03 · DECISION POINT</span>
+              <strong>Intent router</strong>
+              <p>Deterministic rules classify the message. No LLM and no invented business facts.</p>
+              <div className="intent-tags"><span>ORDER_STATUS</span><span>FAQ</span><span>RETURN</span><span>HUMAN / UNKNOWN</span></div>
+            </div>
+            <span className="diagram-line horizontal" aria-hidden="true" />
+            <div className="diagram-outcomes">
+              <OutcomeCard tone="green" title="Order status" detail="OrderService → verified status or human" />
+              <OutcomeCard tone="blue" title="FAQ" detail="Illustrative approved content or human" />
+              <OutcomeCard tone="amber" title="Return request" detail="Human handoff · future Returns API" />
+              <OutcomeCard tone="slate" title="Human / unknown" detail="Structured handoff to support" />
+            </div>
+          </div>
+          <div className="architecture-boundaries">
+            <div><span>TRUSTED SYSTEM</span><strong>OrderService</strong><small>Mock by default · HTTP adapter available</small></div>
+            <div><span>SAFE KNOWLEDGE</span><strong>Demo FAQ</strong><small>Shipping · hours · contact · return policy</small></div>
+            <div><span>ESCALATION OBJECT</span><strong>Human handoff</strong><small>Customer · intent · reason · order context</small></div>
+          </div>
+        </section>
+
+        <section className="tech-stack-section" aria-labelledby="tech-stack-title">
+          <div className="tech-stack-intro"><p className="eyebrow">Implementation</p><h2 id="tech-stack-title">Tech stack</h2><p>Small surface area, deployable by default, and easy to replace piece by piece in production.</p></div>
+          <div className="stack-grid">
+            <StackItem label="Next.js 16" detail="App Router + static homepage" />
+            <StackItem label="TypeScript" detail="Typed routing and service contracts" />
+            <StackItem label="Tailwind CSS" detail="Responsive enterprise UI" />
+            <StackItem label="Route Handlers" detail="POST /api/support" />
+            <StackItem label="OrderService" detail="Mock + HTTP adapters" />
+            <StackItem label="Vercel-ready" detail="No DB, auth, or external AI" />
           </div>
         </section>
 
@@ -93,11 +116,17 @@ export default function Home() {
   );
 }
 
-function FlowCard({ step, title, detail, accent = false }: { step: string; title: string; detail: string; accent?: boolean }) {
-  return <div className={`flow-card ${accent ? "accent" : ""}`}><span>{step}</span><strong>{title}</strong><small>{detail}</small></div>;
+function DiagramNode({ index, title, detail, icon }: { index: string; title: string; detail: string; icon: string }) {
+  return <div className="diagram-node"><span className="diagram-node-icon">{icon}</span><div><span className="diagram-index">{index}</span><strong>{title}</strong><small>{detail}</small></div></div>;
 }
 
-function FlowArrow() { return <div className="flow-arrow" aria-hidden="true"><span>→</span></div>; }
+function OutcomeCard({ tone, title, detail }: { tone: string; title: string; detail: string }) {
+  return <div className={`outcome-card ${tone}`}><span className="outcome-dot" /><div><strong>{title}</strong><small>{detail}</small></div><span className="outcome-arrow">↗</span></div>;
+}
+
+function StackItem({ label, detail }: { label: string; detail: string }) {
+  return <div className="stack-item"><span className="stack-check">✓</span><div><strong>{label}</strong><small>{detail}</small></div></div>;
+}
 
 function Responsibility({ title, marker, items, featured = false }: { title: string; marker: string; items: string[]; featured?: boolean }) {
   return <article className={`responsibility-card ${featured ? "featured" : ""}`}><div><span>{marker}</span><h3>{title}</h3></div><ul>{items.map((item) => <li key={item}>{item}</li>)}</ul></article>;
